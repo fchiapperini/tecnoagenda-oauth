@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TecnoAgenda – Accesso Google</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f0f4ff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+  .card { background: #fff; border-radius: 16px; padding: 40px 32px; text-align: center; max-width: 360px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+  .logo { font-size: 2rem; font-weight: 800; color: #1a73e8; margin-bottom: 8px; }
+  p { color: #555; font-size: .95rem; line-height: 1.5; }
+  .spinner { width: 36px; height: 36px; border: 4px solid #e0e8ff; border-top-color: #1a73e8; border-radius: 50%; animation: spin .8s linear infinite; margin: 24px auto 0; }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  .err { color: #c62828; background: #fff3f3; border-radius: 8px; padding: 12px; font-size: .875rem; margin-top: 16px; display: none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">TecnoAgenda</div>
+  <p>Reindirizzamento in corso verso l'app…</p>
+  <div class="spinner" id="spinner"></div>
+  <div class="err" id="err"></div>
+</div>
+<script>
+(function () {
+  var APP_SCHEME = 'it.tecnoadsl.agenda';
+  var params = new URLSearchParams(window.location.search);
+  var code  = params.get('code');
+  var error = params.get('error');
+
+  if (error) {
+    showErr('Accesso negato: ' + error);
+    return;
+  }
+  if (!code) {
+    showErr('Parametro "code" mancante nell\'URL.');
+    return;
+  }
+
+  // Costruisce il deep link verso l'app:  it.tecnoadsl.agenda:/oauth?code=...&state=...
+  var qs = new URLSearchParams({ code: code });
+  var state = params.get('state');
+  if (state) qs.set('state', state);
+  var deepLink = APP_SCHEME + ':/oauth?' + qs.toString();
+
+  // Apre il deep link; dopo 2 s mostra istruzioni manuali se l'app non si apre
+  window.location.href = deepLink;
+
+  setTimeout(function () {
+    document.getElementById('spinner').style.display = 'none';
+    showErr('L\'app non si è aperta automaticamente. Riapri TecnoAgenda manualmente: il codice di accesso è già stato ricevuto.');
+  }, 2000);
+
+  function showErr(msg) {
+    var el = document.getElementById('err');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+})();
+</script>
+</body>
+</html>
