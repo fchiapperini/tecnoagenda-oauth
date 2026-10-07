@@ -41,7 +41,7 @@
   var qs = new URLSearchParams({ code: code });
   var state = params.get('state');
   if (state) qs.set('state', state);
-  var deepLink = APP_SCHEME + ':/oauth?' + qs.toString();
+  var deepLink = APP_SCHEME + '://oauth?' + qs.toString();
 
   // Apre il deep link; dopo 2 s mostra istruzioni manuali se l'app non si apre
   window.location.href = deepLink;
